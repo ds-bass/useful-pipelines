@@ -195,45 +195,48 @@ for clfs in clfsList:
 			clf_args[key] = arg
 
 		#fit and get model prediction results
-		results = run(clfs, M, L, Mv, Lv, n_folds, cross_val_train, validation_train, clf_hyper=clf_args)
+		try: #some combos of arguments dont work together
+			results = run(clfs, M, L, Mv, Lv, n_folds, cross_val_train, validation_train, clf_hyper=clf_args)
 
-		#store model results for visualization later
-		for k, v in results.items():
-			#adding temp dictionary data
-			temp_dict = {
-				model_name: {
-					str(clf_args): {
-						'accuracy': [round(results[k]['accuracy'], 8)],
-						'f1': [round(results[k]['accuracy'], 8)],
-						'roc_auc': [round(results[k]['roc_auc'], 8)],
-						'precision': [round(results[k]['precision'], 8)],
-						'recall': [round(results[k]['recall'], 8)]
+			#store model results for visualization later
+			for k, v in results.items():
+				#adding temp dictionary data
+				temp_dict = {
+					model_name: {
+						str(clf_args): {
+							'accuracy': [round(results[k]['accuracy'], 8)],
+							'f1': [round(results[k]['accuracy'], 8)],
+							'roc_auc': [round(results[k]['roc_auc'], 8)],
+							'precision': [round(results[k]['precision'], 8)],
+							'recall': [round(results[k]['recall'], 8)]
+						}
 					}
 				}
-			}
 
-			#first run through, append results dict
-			if len(model_results) == 0:
-				model_results = temp_dict.copy()
-			else:
-				#loop through models already ran to find where to put or append results
-				for k1, v1 in model_results.items():
-					#find previously ran model algo (ex XGB)
-					if k1 == model_name:
-						for k2, v2 in v1.items():
-							#find previously ran hypers of given model algo and append other cross val results
-							if k2 == str(clf_args):
-								model_results[k1][k2]['accuracy'].append(temp_dict[model_name][str(clf_args)]['accuracy'][0])
-								model_results[k1][k2]['f1'].append(temp_dict[model_name][str(clf_args)]['f1'][0])
-								model_results[k1][k2]['roc_auc'].append(temp_dict[model_name][str(clf_args)]['roc_auc'][0])
-								model_results[k1][k2]['precision'].append(temp_dict[model_name][str(clf_args)]['precision'][0])
-								model_results[k1][k2]['recall'].append(temp_dict[model_name][str(clf_args)]['recall'][0])
-						#if first of new hyperparameter batch being ran, make new value of model key
-						if str(clf_args) not in v1.keys():
-							model_results[k1][str(clf_args)] = temp_dict[model_name][str(clf_args)]
-				#if first of model being ran, make new key for it
-				if model_name not in model_results.keys():
-					model_results[model_name] = temp_dict[model_name]
+				#first run through, append results dict
+				if len(model_results) == 0:
+					model_results = temp_dict.copy()
+				else:
+					#loop through models already ran to find where to put or append results
+					for k1, v1 in model_results.items():
+						#find previously ran model algo (ex XGB)
+						if k1 == model_name:
+							for k2, v2 in v1.items():
+								#find previously ran hypers of given model algo and append other cross val results
+								if k2 == str(clf_args):
+									model_results[k1][k2]['accuracy'].append(temp_dict[model_name][str(clf_args)]['accuracy'][0])
+									model_results[k1][k2]['f1'].append(temp_dict[model_name][str(clf_args)]['f1'][0])
+									model_results[k1][k2]['roc_auc'].append(temp_dict[model_name][str(clf_args)]['roc_auc'][0])
+									model_results[k1][k2]['precision'].append(temp_dict[model_name][str(clf_args)]['precision'][0])
+									model_results[k1][k2]['recall'].append(temp_dict[model_name][str(clf_args)]['recall'][0])
+							#if first of new hyperparameter batch being ran, make new value of model key
+							if str(clf_args) not in v1.keys():
+								model_results[k1][str(clf_args)] = temp_dict[model_name][str(clf_args)]
+					#if first of model being ran, make new key for it
+					if model_name not in model_results.keys():
+						model_results[model_name] = temp_dict[model_name]
+		except:
+			pass
 
 #%%
 #Processing and aggregating of model results. 
