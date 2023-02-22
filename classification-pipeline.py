@@ -6,6 +6,8 @@
 import ast
 import numpy as np
 import matplotlib.pyplot as plt
+from datetime import datetime
+from pytz import timezone
 from sklearn import datasets
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
@@ -156,11 +158,11 @@ def run(a_clf, M, L, Mv, Lv, n_folds, cross_val_train, validation_train, clf_hyp
 			# pred = np.argmax(pred, axis=1)
 			ret[n_folds] = {
 				'clf': clf,
-				'accuracy': accuracy_score([L[test_index], pred]),
-				'f1': f1_score(L[test_index], pred, average=score_avg),
-				'roc_auc': multiclass_roc_auc_score(L[test_index], pred),
-				'precision': precision_score(L[test_index], pred, average=score_avg),
-				'recall': recall_score(L[test_index], pred, average=score_avg)
+				'accuracy': accuracy_score(Lv, pred),
+				'f1': f1_score(Lv, pred, average=score_avg),
+				'roc_auc': multiclass_roc_auc_score(Lv, pred),
+				'precision': precision_score(Lv, pred, average=score_avg),
+				'recall': recall_score(Lv, pred, average=score_avg)
 			}
 		else:
 			ret[n_folds] = {
@@ -180,7 +182,7 @@ model_results = {}
 #Loop through the clfs List to run algorithm
 for clfs in clfsList:
 	model_name = str(clfs).rsplit('.',1)[1][:-2]
-	print('running', model_name, 'models')
+	print('running', model_name, 'models\ndatetime:', datetime.now(timezone('EST')).strftime('%Y-%m-%d %H:%M:%S'))
 	
 	list_of_list_hypers = [x for x in clf_hyper[model_name].values()]
 	
